@@ -17,13 +17,14 @@ NOTE: There is also a Getting Started Guide on https://spring.io/guides/gs/sprin
 == Introduction to Docker Labs Platform
 
 1. Login with your docker ID and password.
-2. All the https://labs.play-with-docker.com/[Docker Labs]
-3. Create a folder named `funtainers`
+2. Visit Docker Lab here : https://labs.play-with-docker.com/[Docker Labs]
+3. Create a folder named `funtainers` (Optional)
 4. Git clone the https://github.com/Rajeshmohanty23/docker-springboot[Git Repository]
 [Source]
 ----
 mkdir funtainers
 git clone https://github.com/Rajeshmohanty23/docker-springboot
+cd docker-springboot
 ----
 
 5. Create a docker file in order to create a docker image.
@@ -47,7 +48,7 @@ A Spring Boot application is easy to convert into an executable JAR file. All th
 [source]
 ----
 FROM openjdk:8-jdk-alpine
-VOLUME /tmp
+VOLUME /app
 ARG JAR_FILE
 COPY ${JAR_FILE} app.jar
 ENTRYPOINT ["java","-jar","/app.jar"]
@@ -56,7 +57,7 @@ ENTRYPOINT ["java","-jar","/app.jar"]
 The `JAR_FILE` could be passed in as part of the `docker` command (it will be different for Maven and Gradle). E.g. for Maven:
 
 ```
-$ docker build --build-arg JAR_FILE=target/*.jar -t myorg/myapp .
+$ docker build --build-arg JAR_FILE=target/*.jar -t dockersb .
 ```
 
 
@@ -66,7 +67,7 @@ Of course, once you have chosen a build system, you don't need the `ARG` - you c
 [source]
 ----
 FROM openjdk:8-jdk-alpine
-VOLUME /tmp
+VOLUME /app
 COPY target/*.jar app.jar
 ENTRYPOINT ["java","-jar","/app.jar"]
 ----
@@ -74,7 +75,7 @@ ENTRYPOINT ["java","-jar","/app.jar"]
 Then we can simply build an image with
 
 ```
-$ docker build -t myorg/myapp .
+$ docker build -t dockersb .
 ```
 
 and run it like this:
@@ -110,12 +111,12 @@ NOTE: The alpine base container we used in the example does not have `bash`, so 
 If you have a running container and you want to peek into it, use `docker exec` you can do this:
 
 ```
-$ docker run --name myapp -ti --entrypoint /bin/sh myorg/myapp
+$ docker run --name myapp -ti --entrypoint /bin/sh dockersb
 $ docker exec -ti myapp /bin/sh
 / #
 ```
 
-where `myapp` is the `--name` passed to the `docker run` command. If you didn't use `--name` then docker assigns a mnemonic name which you can scrape from the output of `docker ps`. You could also use the SHA identifier of the container instead of the name, also visible from `docker ps`.
+where `dockersb` is the `--name` passed to the `docker run` command. If you didn't use `--name` then docker assigns a mnemonic name which you can scrape from the output of `docker ps`. You could also use the SHA identifier of the container instead of the name, also visible from `docker ps`.
 
 === The Entry Point
 
@@ -146,7 +147,7 @@ Another interesting aspect of the entry point is whether or not you can inject e
 [source]
 ----
 FROM openjdk:8-jdk-alpine
-VOLUME /tmp
+VOLUME /app
 ARG JAR_FILE=target/*.jar
 COPY ${JAR_FILE} app.jar
 ENTRYPOINT ["java","${JAVA_OPTS}","-jar","/app.jar"]
