@@ -1,5 +1,2 @@
-/.idea/misc.xml
+/.idea/*
 /docker-springboot.iml
-/.idea/compiler.xml
-/.idea/modules.xml
-/.idea/vcs.xml
