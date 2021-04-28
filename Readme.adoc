@@ -29,10 +29,10 @@ cd docker-springboot
 [source]
 ----
 FROM openjdk:8-jdk-alpine
-VOLUME /tmp
-ARG JAR_FILE
-COPY ${JAR_FILE} app.jar
-ENTRYPOINT ["java","-jar","/app.jar"]
+EXPOSE 8085
+WORKDIR /app
+ADD target/*.jar /app/
+ENTRYPOINT ["java", "-jar", "docker-sb.jar"]
 ----
 
 == A Basic Dockerfile
@@ -43,10 +43,10 @@ A Spring Boot application is easy to convert into an executable JAR file. All th
 [source]
 ----
 FROM openjdk:8-jdk-alpine
-VOLUME /app
-ARG JAR_FILE
-COPY ${JAR_FILE} app.jar
-ENTRYPOINT ["java","-jar","/app.jar"]
+EXPOSE 8085
+WORKDIR /app
+ADD target/*.jar /app/
+ENTRYPOINT ["java", "-jar", "docker-sb.jar"]
 ----
 
 The `JAR_FILE` could be passed in as part of the `docker` command (it will be different for Maven and Gradle). E.g. for Maven:
