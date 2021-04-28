@@ -6,12 +6,7 @@ projects: [spring-boot]
 :icons: font
 :source-highlighter: prettify
 
-= Spring Boot in a Container
-
-This is a guide for developers of Spring Boot applications, and containers are not always a good abstraction for developers - they force you to learn about and think about very low level concerns - but you will on occasion be called on to create or use a container, so it pays to understand the building blocks. Here we aim to show you some of the choices you can make if you are faced with the prospect of needing to create your own container.
-
-
-NOTE: There is also a Getting Started Guide on https://github.com/hardik402/docker/blob/main/README.md[Docker], which would also be a good starting point, but it doesn't cover the range of choices that we have here, or in as much detail.
+= Let's play around with an actual application.
 
 == Introduction to Docker Usecase :
 
