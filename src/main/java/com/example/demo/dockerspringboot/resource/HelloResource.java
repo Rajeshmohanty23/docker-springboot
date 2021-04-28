@@ -10,7 +10,7 @@ public class HelloResource {
 
     @GetMapping
     public String Hello(){
-        return "Hello Alberto!";
+        return "Hello Docker!";
     }
 
 }
