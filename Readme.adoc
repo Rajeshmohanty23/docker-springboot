@@ -8,26 +8,21 @@ projects: [spring-boot]
 
 = Spring Boot in a Container
 
-Many people are using containers to wrap their Spring Boot applications, and building containers is not a simple thing to do. This is a guide for developers of Spring Boot applications, and containers are not always a good abstraction for developers - they force you to learn about and think about very low level concerns - but you will on occasion be called on to create or use a container, so it pays to understand the building blocks. Here we aim to show you some of the choices you can make if you are faced with the prospect of needing to create your own container.
+This is a guide for developers of Spring Boot applications, and containers are not always a good abstraction for developers - they force you to learn about and think about very low level concerns - but you will on occasion be called on to create or use a container, so it pays to understand the building blocks. Here we aim to show you some of the choices you can make if you are faced with the prospect of needing to create your own container.
 
-We will assume that you know how to create and build a basic Spring Boot application. If you don't, go to one of the https://spring.io/guides[Getting Started Guides], for example the one on building a https://spring.io/guides/gs/rest-service/[REST Service]. Copy the code from there and practise with some of the ideas below.
 
-NOTE: There is also a Getting Started Guide on https://spring.io/guides/gs/spring-boot-docker[Docker], which would also be a good starting point, but it doesn't cover the range of choices that we have here, or in as much detail.
+NOTE: There is also a Getting Started Guide on https://github.com/hardik402/docker/blob/main/README.md[Docker], which would also be a good starting point, but it doesn't cover the range of choices that we have here, or in as much detail.
 
-== Introduction to Docker Labs Platform
+== Introduction to Docker Usecase :
 
-1. Login with your docker ID and password.
-2. Visit Docker Lab here : https://labs.play-with-docker.com/[Docker Labs]
-3. Create a folder named `funtainers` (Optional)
-4. Git clone the https://github.com/Rajeshmohanty23/docker-springboot[Git Repository]
+1. Git clone the https://github.com/Rajeshmohanty23/docker-springboot[Git Repository]
 [Source]
 ----
-mkdir funtainers
-git clone https://github.com/Rajeshmohanty23/docker-springboot
+git clone https://github.com/Rajeshmohanty23/docker-springboot.git
 cd docker-springboot
 ----
 
-5. Create a docker file in order to create a docker image.
+2. Create a docker file in order to create a docker image.
 
 
 `Dockerfile`
@@ -42,7 +37,7 @@ ENTRYPOINT ["java","-jar","/app.jar"]
 
 == A Basic Dockerfile
 
-A Spring Boot application is easy to convert into an executable JAR file. All the https://spring.io/guides[Getting Started Guides] do this, and every app that you download from https://start.spring.io[Spring Initializr] will have a build step to create an executable JAR. With Maven you `./mvnw install` and with Gradle you `./gradlew build`. A basic Dockerfile to run that JAR would then look like this, at the top level of your project:
+A Spring Boot application is easy to convert into an executable JAR file. All the https://spring.io/guides[Getting Started Guides] do this, and every app that you download from https://start.spring.io[Spring Initializr] will have a build step to create an executable JAR. With Maven you `./mvnw install` . A basic Dockerfile to run that JAR would then look like this, at the top level of your project:
 
 `Dockerfile`
 [source]
@@ -67,9 +62,10 @@ Of course, once you have chosen a build system, you don't need the `ARG` - you c
 [source]
 ----
 FROM openjdk:8-jdk-alpine
-VOLUME /app
-COPY target/*.jar app.jar
-ENTRYPOINT ["java","-jar","/app.jar"]
+EXPOSE 8085
+WORKDIR /app
+ADD target/*.jar /app/
+ENTRYPOINT ["java", "-jar", "docker-sb.jar"]
 ----
 
 Then we can simply build an image with
@@ -96,6 +92,13 @@ Nov 06, 2018 2:45:16 PM org.springframework.boot.SpringApplication logStartupPro
 ...
 ```
 
+Let's use docker run command to start the container with your built image on port 8085.
+
+```
+docker run -network host -p 8085:8085 -d dockersb
+```
+
+
 If you want to poke around inside the image you can open a shell in it like this (the base image does not have `bash`):
 
 ```
@@ -106,12 +109,12 @@ bin      etc      lib      mnt      root     sbin     sys      usr
 / #
 ```
 
-NOTE: The alpine base container we used in the example does not have `bash`, so this is an `ash` shell. It has some of the features of `bash` but not all.
+NOTE: The alpine base container we used in the example does not have `bash`, so this is an `bash` shell. It has some of the features of `bash` but not all.
 
 If you have a running container and you want to peek into it, use `docker exec` you can do this:
 
 ```
-$ docker run --name myapp -ti --entrypoint /bin/sh dockersb
+$ docker run --name dockersb -ti --entrypoint /bin/sh dockersb
 $ docker exec -ti myapp /bin/sh
 / #
 ```
@@ -261,22 +264,6 @@ There are now 3 layers, with all the application resources in the later 2 layers
 
 NOTE: We used a hard-coded main application class `hello.Application`. This will probably be different for your application. You could parameterize it with another `ARG` if you wanted. You could also copy the Spring Boot fat `JarLauncher` into the image and use it to run the app - it would work and you wouldn't need to specify the main class, but it would be a bit slower on startup.
 
-== Tweaks
-
-If you want to start your app as quickly as possible (most people do) there are some tweaks you might consider. Here are some ideas:
-
-* Use the `spring-context-indexer` (https://docs.spring.io/spring/docs/current/spring-framework-reference/core.html#beans-scanning-index[link to docs]). It's not going to add much for small apps, but every little helps.
-* Don't use https://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#production-ready[actuators] if you can afford not to.
-* Use Spring Boot 2.1 and Spring 5.1.
-* Fix the location of the
-https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#boot-features-external-config-application-property-files[Spring Boot config file(s)]
-with `spring.config.location` (command line argument or System property etc.).
-* Switch off JMX - you probably don't need it in a container - with `spring.jmx.enabled=false`
-* Run the JVM with `-noverify`. Also consider `-XX:TieredStopAtLevel=1`
-(that will slow down the JIT later at the expense of the saved startup time).
-* Use the container memory hints for Java 8: `-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap`. With Java 11 this is automatic by default.
-
-Your app might not need a full CPU at runtime, but it will need multiple CPUs to start up as quickly as possible (at least 2, 4 are better). If you don't mind a slower startup you could throttle the CPUs down below 4. If you are forced to start with less than 4 CPUs it might help to set `-Dspring.backgroundpreinitializer.ignore=true` since it prevents Spring Boot from creating a new thread that it probably won't be able to use (this works with Spring Boot 2.1.0 and above).
 
 == Multi-Stage Build
 
@@ -310,57 +297,6 @@ The first image is labelled "build" and it is used to run Maven and build the fa
 Notice that the source code has been split into 4 layers. The later layers contain the build configuration and the source code for the app, and the earlier layers contain the build system itself (the Maven wrapper). This is a small optimization, and it also means that we don't have to copy the `target` directory to a docker image, even a temporary one used for the build.
 
 Every build where the source code changes will be slow because the Maven cache has to be re-created in the first `RUN` section. But you have a completely standalone build that anyone can run to get your application running as long as they have docker. That can be quite useful in some environments, e.g. where you need to share your code with people who don't know Java.
-
-=== Experimental Features
-
-Docker 18.06 comes with some https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/experimental.md["experimental" features] that includes a way to cache build dependencies. To switch them on you need a flag in the daemon (`dockerd`) and also an environment variable when you run the client, and then you can add a magic first line to your Dockerfile:
-
-`Dockerfile`
-[source]
-----
-# syntax=docker/dockerfile:experimental
-----
-
-and the `RUN` directive then accepts a new flag `--mount`. Here's a full example:
-
-
-`Dockerfile`
-[source]
-----
-# syntax=docker/dockerfile:experimental
-FROM openjdk:8-jdk-alpine as build
-WORKDIR /workspace/app
-
-COPY mvnw .
-COPY .mvn .mvn
-COPY pom.xml .
-COPY src src
-
-RUN --mount=type=cache,target=/root/.m2 ./mvnw install -DskipTests
-RUN mkdir -p target/dependency && (cd target/dependency; jar -xf ../*.jar)
-
-FROM openjdk:8-jdk-alpine
-VOLUME /tmp
-ARG DEPENDENCY=/workspace/app/target/dependency
-COPY --from=build ${DEPENDENCY}/BOOT-INF/lib /app/lib
-COPY --from=build ${DEPENDENCY}/META-INF /app/META-INF
-COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
-ENTRYPOINT ["java","-cp","app:app/lib/*","hello.Application"]
-----
-
-Then run it:
-
-```
-$ DOCKER_BUILDKIT=1 docker build -t myorg/myapp .
-...
- => /bin/sh -c ./mvnw install -DskipTests              5.7s
- => exporting to image                                 0.0s
- => => exporting layers                                0.0s
- => => writing image sha256:3defa...
- => => naming to docker.io/myorg/myapp
-```
-
-With the experimental features you get a different output on the console, but you can see that a Maven build now only takes a few seconds instead of minutes, once the cache is warm.
 
 == Security Aspects
 
