@@ -44,29 +44,10 @@ ADD target/*.jar /app/
 ENTRYPOINT ["java", "-jar", "docker-sb.jar"]
 ----
 
-The `JAR_FILE` could be passed in as part of the `docker` command (it will be different for Maven and Gradle). E.g. for Maven:
-
-```
-$ docker build --build-arg JAR_FILE=target/*.jar -t dockersb .
-```
-
-
-Of course, once you have chosen a build system, you don't need the `ARG` - you can just hard code the jar location. E.g. for Maven:
-
-`Dockerfile`
-[source]
-----
-FROM openjdk:8-jdk-alpine
-EXPOSE 8085
-WORKDIR /app
-ADD target/*.jar /app/
-ENTRYPOINT ["java", "-jar", "docker-sb.jar"]
-----
-
 Then we can simply build an image with
 
 ```
-$ docker build -t dockersb .
+$ docker build -t dockersb_<corpkey> .
 ```
 
 and run it like this:
@@ -90,8 +71,27 @@ Nov 06, 2018 2:45:16 PM org.springframework.boot.SpringApplication logStartupPro
 Let's use docker run command to start the container with your built image on port 8085.
 
 ```
-docker run -network host -p 8085:8085 -d dockersb
+docker run -network host -p 8085:8085 -d dockersb_<corpkey>
 ```
+
+`Dockerfile`
+[source]
+----
+FROM openjdk:8-jdk-alpine
+EXPOSE 8085
+WORKDIR /app
+ADD target/*.jar /app/
+ENTRYPOINT ["java", "-jar", "docker-sb.jar"]
+----
+
+The `JAR_FILE` could be passed in as part of the `docker` command (it will be different for Maven and Gradle). E.g. for Maven:
+
+```
+$ docker build --build-arg JAR_FILE=target/*.jar -t dockersb_<corpkey> .
+```
+
+
+Of course, once you have chosen a build system, you don't need the `ARG` - you can just hard code the jar location. E.g. for Maven:
 
 
 If you want to poke around inside the image you can open a shell in it like this (the base image does not have `bash`):
@@ -109,12 +109,12 @@ NOTE: The alpine base container we used in the example does not have `bash`, so 
 If you have a running container and you want to peek into it, use `docker exec` you can do this:
 
 ```
-$ docker run --name dockersb -ti --entrypoint /bin/sh dockersb
-$ docker exec -ti myapp /bin/sh
+$ docker run --name dockersb_<corpkey> -ti --entrypoint /bin/sh dockersb_<corpkey>
+$ docker exec -ti dockersb_<corpkey> /bin/sh
 / #
 ```
 
-where `dockersb` is the `--name` passed to the `docker run` command. If you didn't use `--name` then docker assigns a mnemonic name which you can scrape from the output of `docker ps`. You could also use the SHA identifier of the container instead of the name, also visible from `docker ps`.
+where `dockersb_<corpkey>` is the `--name` passed to the `docker run` command. If you didn't use `--name` then docker assigns a mnemonic name which you can scrape from the output of `docker ps`. You could also use the SHA identifier of the container instead of the name, also visible from `docker ps`.
 
 === The Entry Point
 
