@@ -88,7 +88,7 @@ Nov 06, 2018 2:45:16 PM org.springframework.boot.SpringApplication logStartupPro
 Let's use docker run command to start the container with your built image on port 8085.
 
 ```
-docker run -network host -p 8085:8085 -d dockersb_<corpkey>
+docker run --network host -p 8085:8085 -d dockersb_<corpkey>
 ```
 
 `Dockerfile`
