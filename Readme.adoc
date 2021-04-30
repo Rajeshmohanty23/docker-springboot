@@ -10,7 +10,7 @@ projects: [spring-boot]
 
 == Introduction to Docker Usecase :
 
-1. Git clone the https://github.com/Rajeshmohanty23/docker-springboot[Git Repository]
+> Clone this Git repository in your machine : https://github.com/Rajeshmohanty23/docker-springboot[Git Repository]
 [Source]
 ----
 git clone https://github.com/Rajeshmohanty23/docker-springboot.git
