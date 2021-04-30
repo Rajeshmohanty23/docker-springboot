@@ -16,7 +16,6 @@ projects: [spring-boot]
 git clone https://github.com/Rajeshmohanty23/docker-springboot.git
 cd docker-springboot
 ----
-
 2. Ideally, we create a docker file in order to create a docker image.
 Here you can already find already created `Dockerfile` in `docker-springboot/` folder with following content.
 
@@ -44,7 +43,7 @@ ADD target/*.jar /app/
 ENTRYPOINT ["java", "-jar", "docker-sb.jar"]
 ----
 
-Then we can simply build an image with
+3. Then we can simply build an image with following command. Here we are appending `_<corpkey>` to identify the image with a specific tag. Also you can do a `grep` to find your own image easily.
 
 ```
 $ docker build -t dockersb_<corpkey> .
@@ -53,7 +52,7 @@ $ docker build -t dockersb_<corpkey> .
 and run it like this:
 
 ```
-$ docker run -p 8080:8080 myorg/myapp
+$ docker run -p 8085:8085 dockersb_<corpkey>
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
 ( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
