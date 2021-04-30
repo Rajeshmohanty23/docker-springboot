@@ -91,6 +91,9 @@ Let's use docker run command to start the container with your built image on por
 docker run --network host -p 8085:8085 -d dockersb_<corpkey>
 ```
 
+You can always push your built docker images to central docker registry [DockerHub]
+More info can be found https://docs.docker.com/docker-hub/repos/[Here].
+
 `Dockerfile`
 [source]
 ----
