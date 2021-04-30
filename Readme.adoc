@@ -6,6 +6,24 @@ projects: [spring-boot]
 :icons: font
 :source-highlighter: prettify
 
+== Getting Started
+
+...Queries I had in my mind, when I started learning ...
+
+----
+ - How these docker images are built ?
+ - Can I build an image of my own ?
+ - Can any application just run as a container ?
+
+----
+
+> Let's Start with a hello-world example..
+
+[Source]
+```
+docker run hello-world
+```
+
 = Let's play around with an actual application.
 
 == Introduction to Docker Usecase :
@@ -16,7 +34,7 @@ projects: [spring-boot]
 git clone https://github.com/Rajeshmohanty23/docker-springboot.git
 cd docker-springboot
 ----
->1. Ideally, we create a docker file in order to create a docker image.
+ 1. Ideally, we create a docker file in order to create a docker image.
 Here you can already find already created `Dockerfile` in `docker-springboot/` folder with following content.
 
 `Dockerfile`
