@@ -17,8 +17,8 @@ git clone https://github.com/Rajeshmohanty23/docker-springboot.git
 cd docker-springboot
 ----
 
-2. Create a docker file in order to create a docker image.
-
+2. Ideally, we create a docker file in order to create a docker image.
+Here you can already find already created `Dockerfile` in `docker-springboot/` folder with following content.
 
 `Dockerfile`
 [source]
